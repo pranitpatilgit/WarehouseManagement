@@ -1,0 +1,19 @@
+server:
+  port: 8090
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+
+application:
+
+logging:
+  level:
+    com.pranitpatil : INFO
+    org.springframework.web : DEBUG
+  file: ${log.path}/warehouseManagement.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m - %X{requestID}%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m - %X{requestID}%n"
