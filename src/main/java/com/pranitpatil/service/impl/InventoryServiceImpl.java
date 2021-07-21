@@ -64,4 +64,30 @@ public class InventoryServiceImpl implements InventoryService {
         articleRepository.saveAll(articles);
     }
 
+    @Override
+    public Article saveArticle(Article article) {
+
+        com.pranitpatil.entity.Article articleEntity =  articleRepository.save(
+                modelMapper.map(article, com.pranitpatil.entity.Article.class));
+
+        return modelMapper.map(articleEntity, Article.class);
+    }
+
+    @Override
+    public Article updateArticle(Article article) {
+
+        com.pranitpatil.entity.Article articleEntity = articleRepository.findById(article.getId()).
+                orElseThrow(() -> new NotFoundException("Article with id - " + article.getId() + " is not found."));
+
+        articleEntity.setName(article.getName());
+        articleEntity.setStock(article.getStock());
+
+        articleRepository.save(articleEntity);
+        return modelMapper.map(articleEntity, Article.class);
+    }
+
+    @Override
+    public void deleteArticle(String id) {
+        articleRepository.deleteById(id);
+    }
 }

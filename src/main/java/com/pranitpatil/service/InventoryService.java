@@ -10,4 +10,9 @@ public interface InventoryService {
 
     void loadArticlesFromFile(String path) throws IOException;
 
+    Article saveArticle(Article article);
+
+    Article updateArticle(Article article);
+
+    void deleteArticle(String id);
 }
