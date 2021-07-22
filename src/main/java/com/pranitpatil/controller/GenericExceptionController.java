@@ -2,6 +2,7 @@ package com.pranitpatil.controller;
 
 import com.pranitpatil.dto.ErrorResponse;
 import com.pranitpatil.exception.NotFoundException;
+import com.pranitpatil.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,10 @@ public class GenericExceptionController {
     private static final String ERROR_RESP_TEXT = "Sending error response - ";
 
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler({NotFoundException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody
-    ErrorResponse handleException(NotFoundException exception) {
+    ErrorResponse handleException(RuntimeException exception) {
         logger.error(ERROR_RESP_TEXT, exception);
 
         return new ErrorResponse(exception.getMessage());

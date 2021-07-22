@@ -12,6 +12,7 @@ import com.pranitpatil.entity.ArticleQuantity;
 import com.pranitpatil.exception.NotFoundException;
 import com.pranitpatil.service.ProductService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
         com.pranitpatil.entity.Product product = productRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Product with id - " + id + " is not found."));
 
-        return modelMapper.map(product, Product.class);
+        return getProductDto(product);
     }
 
     @Override
@@ -61,13 +62,13 @@ public class ProductServiceImpl implements ProductService {
 
         List<com.pranitpatil.entity.Product> productEntities = products.getProducts()
                 .stream()
-                .map(p -> getProduct(p))
+                .map(p -> getProductEntity(p))
                 .collect(Collectors.toList());
 
         productRepository.saveAll(productEntities);
     }
 
-    private com.pranitpatil.entity.Product getProduct(Product p){
+    private com.pranitpatil.entity.Product getProductEntity(Product p){
 
         com.pranitpatil.entity.Product product =  modelMapper.map(p, com.pranitpatil.entity.Product.class);
 
@@ -80,6 +81,17 @@ public class ProductServiceImpl implements ProductService {
         product.setArticles(articleQuantities);
 
         return product;
+    }
+
+    private Product getProductDto(com.pranitpatil.entity.Product product){
+
+        Product productDto = modelMapper.map(product, Product.class);
+
+        List<com.pranitpatil.dto.ArticleQuantity> articleQuantities = modelMapper.map(product.getArticles(),
+                new TypeToken<List<com.pranitpatil.dto.ArticleQuantity>>() {}.getType());
+        productDto.setArticleQuantities(articleQuantities);
+
+        return productDto;
     }
 
     @Override
@@ -114,5 +126,11 @@ public class ProductServiceImpl implements ProductService {
      */
     private int getArticleStock(ArticleQuantity articleQuantity) {
         return articleRepository.findById(articleQuantity.getArticleid()).orElse(new Article()).getStock();
+    }
+
+    @Override
+    public Product saveProduct(Product product) {
+        com.pranitpatil.entity.Product productEntity =  productRepository.save(getProductEntity(product));
+        return getProductDto(productEntity);
     }
 }

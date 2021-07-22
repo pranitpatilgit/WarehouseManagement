@@ -13,4 +13,6 @@ public interface ProductService {
     void loadProductsFromFile(String path) throws IOException;
 
     List<AvailableProduct> getAllAvailableProducts();
+
+    Product saveProduct(Product product);
 }
