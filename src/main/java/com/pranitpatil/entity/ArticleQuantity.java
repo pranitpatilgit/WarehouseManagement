@@ -27,6 +27,9 @@ public class ArticleQuantity extends AuditableEntity{
     @Column
     private int quantity;
 
+    public ArticleQuantity() {
+    }
+
     public ArticleQuantity(Product product, String articleid, int quantity) {
         this.product = product;
         this.articleid = articleid;

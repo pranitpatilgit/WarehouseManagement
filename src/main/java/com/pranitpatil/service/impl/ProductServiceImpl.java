@@ -2,9 +2,12 @@ package com.pranitpatil.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pranitpatil.config.WarehouseManagementProperties;
+import com.pranitpatil.dao.ArticleRepository;
 import com.pranitpatil.dao.ProductRepository;
+import com.pranitpatil.dto.AvailableProduct;
 import com.pranitpatil.dto.Product;
 import com.pranitpatil.dto.Products;
+import com.pranitpatil.entity.Article;
 import com.pranitpatil.entity.ArticleQuantity;
 import com.pranitpatil.exception.NotFoundException;
 import com.pranitpatil.service.ProductService;
@@ -26,14 +29,17 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
     private ModelMapper modelMapper;
     private WarehouseManagementProperties warehouseManagementProperties;
+    private ArticleRepository articleRepository;
 
     @Autowired
     public ProductServiceImpl(ObjectMapper objectMapper, ProductRepository productRepository,
-                              ModelMapper modelMapper, WarehouseManagementProperties warehouseManagementProperties) {
+                              ModelMapper modelMapper, WarehouseManagementProperties warehouseManagementProperties,
+                              ArticleRepository articleRepository) {
         this.objectMapper = objectMapper;
         this.productRepository = productRepository;
         this.modelMapper = modelMapper;
         this.warehouseManagementProperties = warehouseManagementProperties;
+        this.articleRepository = articleRepository;
     }
 
     @PostConstruct
@@ -76,4 +82,37 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
+    @Override
+    public List<AvailableProduct> getAllAvailableProducts() {
+
+        List<com.pranitpatil.entity.Product> products = productRepository.findAll();
+        List<AvailableProduct> availableProducts = new ArrayList<>();
+
+        for(com.pranitpatil.entity.Product product : products){
+            int productQuantity = Integer.MAX_VALUE;
+            for(ArticleQuantity articleQuantity : product.getArticles()){
+                int totalArtQantity = getArticleStock(articleQuantity);
+
+                int maxQuantity =  totalArtQantity / articleQuantity.getQuantity();
+                if(maxQuantity < productQuantity){
+                    productQuantity = maxQuantity;
+                }
+            }
+
+            availableProducts.add(new AvailableProduct(product.getId(), product.getName(), product.getPrice(),
+                    productQuantity));
+        }
+
+        return availableProducts;
+    }
+
+    /**
+     * Get available article stock.
+     * If article is not found then returns ZERO
+     * @param articleQuantity
+     * @return
+     */
+    private int getArticleStock(ArticleQuantity articleQuantity) {
+        return articleRepository.findById(articleQuantity.getArticleid()).orElse(new Article()).getStock();
+    }
 }
