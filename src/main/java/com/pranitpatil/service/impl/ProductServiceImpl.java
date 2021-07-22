@@ -10,11 +10,13 @@ import com.pranitpatil.dto.Products;
 import com.pranitpatil.entity.Article;
 import com.pranitpatil.entity.ArticleQuantity;
 import com.pranitpatil.exception.NotFoundException;
+import com.pranitpatil.exception.ValidationException;
 import com.pranitpatil.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -101,21 +103,27 @@ public class ProductServiceImpl implements ProductService {
         List<AvailableProduct> availableProducts = new ArrayList<>();
 
         for(com.pranitpatil.entity.Product product : products){
-            int productQuantity = Integer.MAX_VALUE;
-            for(ArticleQuantity articleQuantity : product.getArticles()){
-                int totalArtQantity = getArticleStock(articleQuantity);
+            AvailableProduct availableProduct = getAvailableProduct(product);
 
-                int maxQuantity =  totalArtQantity / articleQuantity.getQuantity();
-                if(maxQuantity < productQuantity){
-                    productQuantity = maxQuantity;
-                }
-            }
-
-            availableProducts.add(new AvailableProduct(product.getId(), product.getName(), product.getPrice(),
-                    productQuantity));
+            availableProducts.add(availableProduct);
         }
 
         return availableProducts;
+    }
+
+    private AvailableProduct getAvailableProduct(com.pranitpatil.entity.Product product) {
+        int productQuantity = Integer.MAX_VALUE;
+        for(ArticleQuantity articleQuantity : product.getArticles()){
+            int totalArtQantity = getArticleStock(articleQuantity);
+
+            int maxQuantity =  totalArtQantity / articleQuantity.getQuantity();
+            if(maxQuantity < productQuantity){
+                productQuantity = maxQuantity;
+            }
+        }
+
+        return new AvailableProduct(product.getId(), product.getName(), product.getPrice(),
+                productQuantity);
     }
 
     /**
@@ -132,5 +140,24 @@ public class ProductServiceImpl implements ProductService {
     public Product saveProduct(Product product) {
         com.pranitpatil.entity.Product productEntity =  productRepository.save(getProductEntity(product));
         return getProductDto(productEntity);
+    }
+
+    @Override
+    @Transactional
+    public void sellProduct(long productId, int quantity) {
+        com.pranitpatil.entity.Product product = productRepository.findById(productId).
+                orElseThrow(() -> new NotFoundException("Product with id - " + productId + " is not found."));
+
+        if(quantity > getAvailableProduct(product).getAvailableQuantity()){
+            throw new ValidationException("Not enough products available");
+        }
+
+        for(ArticleQuantity articleQuantity : product.getArticles()){
+            Article article = articleRepository.findById(articleQuantity.getArticleid())
+                    .orElseThrow(() -> new NotFoundException("Article with id - " + articleQuantity.getArticleid() + " is not found."));
+
+            article.setStock(article.getStock() - (articleQuantity.getQuantity() * quantity));
+            articleRepository.save(article);
+        }
     }
 }

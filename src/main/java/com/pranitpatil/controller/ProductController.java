@@ -49,7 +49,9 @@ public class ProductController {
             throw new ValidationException("Sold quantity cannot be 0.");
         }
 
-        logger.info("Sold {} numbers of product {}.", quantity, productId);
+        logger.info("Selling {} numbers of product {}.", quantity, productId);
+
+        productService.sellProduct(productId, quantity);
     }
 
     @GetMapping("{productId}")

@@ -15,4 +15,6 @@ public interface ProductService {
     List<AvailableProduct> getAllAvailableProducts();
 
     Product saveProduct(Product product);
+
+    void sellProduct(long productId, int quantity);
 }
