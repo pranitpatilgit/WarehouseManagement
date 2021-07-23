@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +56,9 @@ public class ProductServiceImplTest {
         productEntity.setName("P1");
         productEntity.setPrice(1.01);
 
+        ArticleQuantity articleQuantity = new ArticleQuantity(productEntity, "1", 10);
+        productEntity.setArticles(Arrays.asList(articleQuantity));
+
         when(productRepository.findById(1L)).thenReturn(Optional.of(productEntity));
 
         com.pranitpatil.dto.Product productDto = productService.getProductById(1);
@@ -62,6 +66,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productDto.getId(), productEntity.getId());
         Assert.assertEquals(productDto.getName(), productEntity.getName());
         Assert.assertEquals(productDto.getPrice(), productEntity.getPrice(), 0);
+        Assert.assertEquals(productDto.getArticleQuantities().get(0).getArticleId(), articleQuantity.getArticleid());
     }
 
     @Test
