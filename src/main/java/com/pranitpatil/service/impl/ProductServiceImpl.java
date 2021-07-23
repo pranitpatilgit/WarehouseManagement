@@ -2,6 +2,8 @@ package com.pranitpatil.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pranitpatil.config.WarehouseManagementProperties;
+import com.pranitpatil.controller.ArticleController;
+import com.pranitpatil.controller.ProductController;
 import com.pranitpatil.dao.ArticleRepository;
 import com.pranitpatil.dao.ProductRepository;
 import com.pranitpatil.dto.AvailableProduct;
@@ -13,8 +15,9 @@ import com.pranitpatil.exception.NotFoundException;
 import com.pranitpatil.exception.ValidationException;
 import com.pranitpatil.service.ProductService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,8 +92,18 @@ public class ProductServiceImpl implements ProductService {
 
         Product productDto = modelMapper.map(product, Product.class);
 
-        List<com.pranitpatil.dto.ArticleQuantity> articleQuantities = modelMapper.map(product.getArticles(),
-                new TypeToken<List<com.pranitpatil.dto.ArticleQuantity>>() {}.getType());
+        List<com.pranitpatil.dto.ArticleQuantity> articleQuantities = new ArrayList<>();
+        for(ArticleQuantity articleQuantity : product.getArticles()){
+            com.pranitpatil.dto.ArticleQuantity articleQuantityDto = modelMapper.map(
+                    articleQuantity, com.pranitpatil.dto.ArticleQuantity.class);
+
+            Link articleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ArticleController.class)
+                    .getArticleById(articleQuantity.getArticleid())).withRel("artcle");
+
+            articleQuantityDto.add(articleLink);
+            articleQuantities.add(articleQuantityDto);
+        }
+
         productDto.setArticleQuantities(articleQuantities);
 
         return productDto;
@@ -104,6 +117,10 @@ public class ProductServiceImpl implements ProductService {
 
         for(com.pranitpatil.entity.Product product : products){
             AvailableProduct availableProduct = getAvailableProduct(product);
+
+            Link productLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ProductController.class)
+                    .getProduct(availableProduct.getId())).withRel("product");
+            availableProduct.add(productLink);
 
             availableProducts.add(availableProduct);
         }

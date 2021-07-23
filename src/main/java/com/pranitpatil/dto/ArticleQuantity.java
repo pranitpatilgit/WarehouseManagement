@@ -1,8 +1,9 @@
 package com.pranitpatil.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.hateoas.RepresentationModel;
 
-public class ArticleQuantity {
+public class ArticleQuantity extends RepresentationModel<ArticleQuantity> {
 
     @JsonProperty("art_id")
     private String articleId;

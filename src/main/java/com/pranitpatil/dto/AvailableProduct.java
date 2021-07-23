@@ -1,6 +1,8 @@
 package com.pranitpatil.dto;
 
-public class AvailableProduct {
+import org.springframework.hateoas.RepresentationModel;
+
+public class AvailableProduct extends RepresentationModel<AvailableProduct> {
 
     private long id;
     private String name;
