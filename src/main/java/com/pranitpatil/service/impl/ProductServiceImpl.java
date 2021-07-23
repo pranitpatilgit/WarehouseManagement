@@ -101,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
                     articleQuantity, com.pranitpatil.dto.ArticleQuantity.class);
 
             Link articleLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ArticleController.class)
-                    .getArticleById(articleQuantity.getArticleid())).withRel("artcle");
+                    .getArticleById(articleQuantity.getArticleid())).withRel("article");
 
             articleQuantityDto.add(articleLink);
             articleQuantities.add(articleQuantityDto);
