@@ -1,6 +1,6 @@
 # WarehouseManagement
 
-This is a Spring Boot REST application for the game **Warehouse Management**.
+This is a Spring Boot REST application for **Warehouse Management**.
 
 ### **Prerequisites**
 - JDK 11+
@@ -13,7 +13,7 @@ This project is maven project so can be build using following maven command
     mvn clean install
 
 ### **Deploy**
-- Run com.pranitpatil.config.WarehouseMaagementConfig from your IDE
+- Run com.pranitpatil.WarehouseManagementApp from your IDE
 OR
 - Run following command after maven build
 
@@ -27,9 +27,9 @@ Following endpoints can be used
 
 ####    Product Endpoints
 - ####  Get All Available Products
-  Gets all products with their available quantity. 
-  This is a API with pagination and sorting,
-  Provide page details as query parameters.
+  - Gets all products with their available quantity. 
+  - This is a API with pagination and sorting,
+  - Provide page details as query parameters.
   
       Sample Request
     
@@ -187,9 +187,23 @@ Following endpoints can be used
             
 
 - ####  Update Article
-     Refer Create Article request use method PUT instead of POST
-     Successful Response Status code is 200
+  Updates and existing article
      
+     Sample Request
+       
+               curl --header "Content-Type: application/json" \
+                 --request PUT \
+                 --data '{"name": "test","stock": 19,"art_id": "20"}' \
+                 http://localhost:8090/rest/article
+       
+     Sample Response (With HTTP Status Code - 200)
+   
+           {
+               "name": "test",
+               "stock": 19,
+               "art_id": "20"
+           }
+                 
 
 - ####  Delete Article
   Deletes the article
