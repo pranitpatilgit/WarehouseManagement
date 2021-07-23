@@ -5,6 +5,7 @@ import com.pranitpatil.config.WarehouseManagementProperties;
 import com.pranitpatil.dao.ArticleRepository;
 import com.pranitpatil.dao.ProductRepository;
 import com.pranitpatil.dto.AvailableProduct;
+import com.pranitpatil.dto.PagedResponse;
 import com.pranitpatil.entity.Article;
 import com.pranitpatil.entity.ArticleQuantity;
 import com.pranitpatil.entity.Product;
@@ -15,6 +16,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,12 +90,14 @@ public class ProductServiceImplTest {
         Article article = new Article();
         article.setStock(4);
 
-        when(productRepository.findAll()).thenReturn(products);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(products));
         when(articleRepository.findById(anyString())).thenReturn(Optional.of(article));
 
-        List<AvailableProduct> availableProducts = productService.getAllAvailableProducts();
+        PagedResponse<AvailableProduct> response = productService.getAllAvailableProducts(pageable);
 
-        Assert.assertEquals(1, availableProducts.get(0).getAvailableQuantity());
+        Assert.assertEquals(1, response.getEntity().get(0).getAvailableQuantity());
     }
 
     @Test
@@ -109,11 +116,13 @@ public class ProductServiceImplTest {
         Article article = new Article();
         article.setStock(2);
 
-        when(productRepository.findAll()).thenReturn(products);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(products));
         when(articleRepository.findById(anyString())).thenReturn(Optional.of(article));
 
-        List<AvailableProduct> availableProducts = productService.getAllAvailableProducts();
+        PagedResponse<AvailableProduct> response = productService.getAllAvailableProducts(pageable);
 
-        Assert.assertEquals(0, availableProducts.get(0).getAvailableQuantity());
+        Assert.assertEquals(0, response.getEntity().get(0).getAvailableQuantity());
     }
 }

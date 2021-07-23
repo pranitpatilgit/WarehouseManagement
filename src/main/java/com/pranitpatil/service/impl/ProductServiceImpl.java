@@ -7,6 +7,7 @@ import com.pranitpatil.controller.ProductController;
 import com.pranitpatil.dao.ArticleRepository;
 import com.pranitpatil.dao.ProductRepository;
 import com.pranitpatil.dto.AvailableProduct;
+import com.pranitpatil.dto.PagedResponse;
 import com.pranitpatil.dto.Product;
 import com.pranitpatil.dto.Products;
 import com.pranitpatil.entity.Article;
@@ -16,6 +17,8 @@ import com.pranitpatil.exception.ValidationException;
 import com.pranitpatil.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
@@ -110,12 +113,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<AvailableProduct> getAllAvailableProducts() {
+    public PagedResponse<AvailableProduct> getAllAvailableProducts(Pageable pageable) {
 
-        List<com.pranitpatil.entity.Product> products = productRepository.findAll();
+        Page<com.pranitpatil.entity.Product> page = productRepository.findAll(pageable);
         List<AvailableProduct> availableProducts = new ArrayList<>();
 
-        for(com.pranitpatil.entity.Product product : products){
+        for(com.pranitpatil.entity.Product product : page.getContent()){
             AvailableProduct availableProduct = getAvailableProduct(product);
 
             Link productLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ProductController.class)
@@ -125,7 +128,13 @@ public class ProductServiceImpl implements ProductService {
             availableProducts.add(availableProduct);
         }
 
-        return availableProducts;
+        PagedResponse<AvailableProduct> pagedResponse = new PagedResponse<>();
+        pagedResponse.setEntity(availableProducts);
+        pagedResponse.setPageNumber(page.getNumber());
+        pagedResponse.setTotalItems(page.getTotalElements());
+        pagedResponse.setTotalPages(page.getTotalPages());
+
+        return pagedResponse;
     }
 
     private AvailableProduct getAvailableProduct(com.pranitpatil.entity.Product product) {

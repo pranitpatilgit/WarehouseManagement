@@ -1,12 +1,17 @@
 package com.pranitpatil.controller;
 
 import com.pranitpatil.dto.AvailableProduct;
+import com.pranitpatil.dto.PagedResponse;
 import com.pranitpatil.dto.Product;
 import com.pranitpatil.exception.ValidationException;
 import com.pranitpatil.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "rest/product", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,17 +38,18 @@ public class ProductController {
 
     @GetMapping("availableProducts")
     @ResponseStatus(HttpStatus.OK)
-    public List<AvailableProduct> getAllProducts(){
+    public PagedResponse<AvailableProduct> getAllProducts(@PageableDefault(page = 0, size = 10)
+                   @SortDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
-        return productService.getAllAvailableProducts();
+        return productService.getAllAvailableProducts(pageable);
     }
 
     @PostMapping("sell/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public void sellProduct(@PathVariable long productId,
-                            @RequestParam(required = false, defaultValue = "1") int quantity){
+                            @RequestParam(required = false, defaultValue = "1") int quantity) {
 
-        if(quantity == 0){
+        if (quantity == 0) {
             throw new ValidationException("Sold quantity cannot be 0.");
         }
 
@@ -56,13 +60,13 @@ public class ProductController {
 
     @GetMapping("{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public Product getProduct(@PathVariable long productId){
+    public Product getProduct(@PathVariable long productId) {
         return productService.getProductById(productId);
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public Product addNewProduct(@RequestBody Product product){
+    public Product addNewProduct(@RequestBody Product product) {
         return productService.saveProduct(product);
     }
 }

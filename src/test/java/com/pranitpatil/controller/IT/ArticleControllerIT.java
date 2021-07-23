@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pranitpatil.dto.Article;
 import com.pranitpatil.dto.AvailableProduct;
+import com.pranitpatil.dto.PagedResponse;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.List;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,8 +31,6 @@ public class ArticleControllerIT {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-
 
     @Test
     public void givenIncreaseArticleStock_whenGetAvailableProduct_thenStatus200AndIncreasedQuantity() throws Exception {
@@ -68,14 +65,14 @@ public class ArticleControllerIT {
     }
 
     private void verifyProductQuantity(String productName, int quantity) throws Exception {
-        List<AvailableProduct> availableProducts = objectMapper.readValue(mvc.perform(MockMvcRequestBuilders.get("/rest/product/availableProducts")
+        PagedResponse<AvailableProduct> availableProducts = objectMapper.readValue(mvc.perform(MockMvcRequestBuilders.get("/rest/product/availableProducts")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString(), new TypeReference<List<AvailableProduct>>() {});
+                .andReturn().getResponse().getContentAsString(), new TypeReference<PagedResponse<AvailableProduct>>() {});
 
         boolean found = false;
-        for (AvailableProduct p : availableProducts) {
+        for (AvailableProduct p : availableProducts.getEntity()) {
             if (p.getName().equals(productName)) {
                 found = true;
                 Assert.assertEquals(p.getAvailableQuantity(), quantity);

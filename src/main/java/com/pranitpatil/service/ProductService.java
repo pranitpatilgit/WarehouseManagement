@@ -1,10 +1,11 @@
 package com.pranitpatil.service;
 
 import com.pranitpatil.dto.AvailableProduct;
+import com.pranitpatil.dto.PagedResponse;
 import com.pranitpatil.dto.Product;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
-import java.util.List;
 
 public interface ProductService {
 
@@ -12,7 +13,7 @@ public interface ProductService {
 
     void loadProductsFromFile(String path) throws IOException;
 
-    List<AvailableProduct> getAllAvailableProducts();
+    PagedResponse<AvailableProduct> getAllAvailableProducts(Pageable pageable);
 
     Product saveProduct(Product product);
 

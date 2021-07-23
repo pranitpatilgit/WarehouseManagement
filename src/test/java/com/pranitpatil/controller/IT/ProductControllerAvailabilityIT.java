@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pranitpatil.dto.ArticleQuantity;
 import com.pranitpatil.dto.AvailableProduct;
+import com.pranitpatil.dto.PagedResponse;
 import com.pranitpatil.dto.Product;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,7 +21,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
-import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -67,14 +67,14 @@ public class ProductControllerAvailabilityIT {
     }
 
     private void verifyProductQuantity(String productName, int quantity) throws Exception {
-        List<AvailableProduct> availableProducts = objectMapper.readValue(mvc.perform(MockMvcRequestBuilders.get("/rest/product/availableProducts")
+        PagedResponse<AvailableProduct> availableProducts = objectMapper.readValue(mvc.perform(MockMvcRequestBuilders.get("/rest/product/availableProducts")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn().getResponse().getContentAsString(), new TypeReference<List<AvailableProduct>>() {});
+                .andReturn().getResponse().getContentAsString(), new TypeReference<PagedResponse<AvailableProduct>>() {});
 
         boolean found = false;
-        for (AvailableProduct p : availableProducts) {
+        for (AvailableProduct p : availableProducts.getEntity()) {
             if (p.getName().equals(productName)) {
                 found = true;
                 Assert.assertEquals(p.getAvailableQuantity(), quantity);

@@ -37,8 +37,8 @@ public class ProductControllerIT {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Dining Chair"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].availableQuantity").value(2));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.entity[0].name").value("Dining Chair"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.entity[0].availableQuantity").value(2));
     }
 
     @Test
