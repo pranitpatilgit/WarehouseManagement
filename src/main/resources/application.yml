@@ -9,8 +9,8 @@ spring:
 
 
 application:
-  inventory.path: '${inventory.path}'
-  product.path: '${product.path}'
+  inventory.path: ${inventory.path}
+  product.path: ${product.path}
 
 logging:
   level:

@@ -9,5 +9,5 @@ spring:
 
 
 application:
-  inventory.path: "/home/pranit/Pranit/Personal/Code/Ikea/WarehouseManagement/src/main/resources/data/inventory.json"
-  product.path: "/home/pranit/Pranit/Personal/Code/Ikea/WarehouseManagement/src/main/resources/data/products.json"
+  inventory.path: ${PWD}/src/test/resources/data/inventory.json
+  product.path: ${PWD}/src/test/resources/data/products.json
