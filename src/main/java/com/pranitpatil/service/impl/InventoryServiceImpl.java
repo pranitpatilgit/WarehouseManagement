@@ -38,6 +38,10 @@ public class InventoryServiceImpl implements InventoryService {
         this.warehouseManagementProperties = warehouseManagementProperties;
     }
 
+    /**
+     * Loads the articles from specified files at startup
+     * @throws IOException
+     */
     @PostConstruct
     void loadArticles() throws IOException{
         loadArticlesFromFile(warehouseManagementProperties.getInventory().getPath());

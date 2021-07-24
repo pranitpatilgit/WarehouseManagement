@@ -51,6 +51,10 @@ public class ProductServiceImpl implements ProductService {
         this.articleRepository = articleRepository;
     }
 
+    /**
+     * Loads products from specified file at startup
+     * @throws IOException
+     */
     @PostConstruct
     void loadProducts() throws IOException{
         loadProductsFromFile(warehouseManagementProperties.getProduct().getPath());
