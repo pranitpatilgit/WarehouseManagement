@@ -18,6 +18,11 @@ OR
 - Run following command after maven build
 
         java -jar WarehouseManagement-1.0-SNAPSHOT.jar
+ 
+For both the deployment ways you need to set paths of input files.You can set these as VM arguments or directly in application.yml.
+
+        -Dinventory.path="<PATH_TO_FILE>/data/bigInventory.json"
+        -Dproduct.path="<PATH_TO_FILE>/data/bigProducts.json"
 
 ### **API Information**
 API can be accessed from following swagger url
