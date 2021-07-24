@@ -5,6 +5,7 @@ import com.pranitpatil.dto.PagedResponse;
 import com.pranitpatil.dto.Product;
 import com.pranitpatil.exception.ValidationException;
 import com.pranitpatil.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,12 @@ public class ProductController {
 
     @GetMapping("availableProducts")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get All Available Products\n" +
+            "Gets all products with their available quantity.\n" +
+            "\n" +
+            "This is a API with pagination and sorting,\n" +
+            "\n" +
+            "Provide page details as query parameters.")
     public PagedResponse<AvailableProduct> getAllProducts(@PageableDefault(page = 0, size = 10)
                    @SortDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
@@ -46,6 +53,7 @@ public class ProductController {
 
     @PostMapping("sell/{productId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Registers a sell of product and quantity and reduces the article stock accordingly.")
     public void sellProduct(@PathVariable long productId,
                             @RequestParam(required = false, defaultValue = "1") int quantity) {
 
@@ -60,12 +68,14 @@ public class ProductController {
 
     @GetMapping("{productId}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Gets the details of the product")
     public Product getProduct(@PathVariable long productId) {
         return productService.getProductById(productId);
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Creates a new product and returns it")
     public Product addNewProduct(@RequestBody Product product) {
         return productService.saveProduct(product);
     }
